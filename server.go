@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"net"
 	"net/http"
 	"sync"
 	"time"
@@ -12,14 +13,13 @@ import (
 )
 
 type Touch struct {
-	Addr  string
+	Who   string
 	When  time.Time
 	Mutex sync.Mutex
 }
 
 type TouchResponse struct {
-	Last      string `json:"last"`
-	Addr      string `json:"addr"`
+	Who       string `json:"last"`
 	When      int64  `json:"when"`
 	ThoughtOf bool   `json:"thoughtof"`
 }
@@ -38,6 +38,14 @@ var IndexHtml string
 //go:embed favicon.ico
 var FavIconIco string
 
+func WhoIsFromRequest(r *http.Request) (string, error) {
+
+	host, _, _ := net.SplitHostPort(r.RemoteAddr)
+	ua := r.UserAgent()
+
+	return host + "//" + ua, nil
+}
+
 func main() {
 
 	flag.Parse()
@@ -48,13 +56,16 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/whoami", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, r.RemoteAddr)
+		var response TouchResponse
+		response.Who, _ = WhoIsFromRequest(r)
+		response.When = time.Now().UTC().Unix()
+		encoded, _ := json.Marshal(response)
+		fmt.Fprint(w, string(encoded))
 	})
 
 	mux.HandleFunc("/last", func(w http.ResponseWriter, r *http.Request) {
 		var response TouchResponse
-		response.Addr = r.RemoteAddr
-		response.Last = LastTouch.Addr
+		response.Who = LastTouch.Who
 		response.When = LastTouch.When.Unix()
 		encoded, _ := json.Marshal(response)
 		fmt.Fprint(w, string(encoded))
@@ -62,26 +73,28 @@ func main() {
 
 	mux.HandleFunc("/love", func(w http.ResponseWriter, r *http.Request) {
 
-		last := LastTouch.When
-		tenago := time.Now().UTC().Add(-time.Duration(*waitTime) * time.Second)
-		lastPerson := LastTouch.Addr
+		id, _ := WhoIsFromRequest(r)
+		now := time.Now().UTC()
+		past := time.Now().UTC().Add(-time.Duration(*waitTime) * time.Second)
 
-		// Lock and modify last touch
-		if r.RemoteAddr != LastTouch.Addr {
-			LastTouch.Mutex.Lock()
-			LastTouch.Addr = r.RemoteAddr
-			LastTouch.When = time.Now().UTC()
-			LastTouch.Mutex.Unlock()
+		lastWho := LastTouch.Who
+		lastWhen := LastTouch.When
+
+		// Update
+		LastTouch.Mutex.Lock()
+		LastTouch.Who = id
+		LastTouch.When = now
+		LastTouch.Mutex.Unlock()
+
+		// Build response
+		resp := TouchResponse{
+			Who:       lastWho,
+			When:      lastWhen.Unix(),
+			ThoughtOf: lastWho != id && lastWhen.After(past),
 		}
-
-		var response TouchResponse
-		response.Addr = r.RemoteAddr
-		response.Last = lastPerson
-		response.When = LastTouch.When.Unix()
-		response.ThoughtOf = last.After(tenago)
-
-		encoded, _ := json.Marshal(response)
+		encoded, _ := json.Marshal(resp)
 		fmt.Fprint(w, string(encoded))
+
 	})
 
 	mux.HandleFunc("/favicon.ico", func(w http.ResponseWriter, req *http.Request) {

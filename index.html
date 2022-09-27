@@ -27,9 +27,14 @@
       body.unrequited {
         background-color: #6DC4DA;
       }
+
+      #fingerprint {
+        position: fixed;
+        left: 0.25em;
+        bottom: 0.25em;
+      }
     </style>
     <script>
-
       function refreshLoop() {
         fetch("/last")
           .then(function (res) {
@@ -82,7 +87,7 @@
             return res.text();
           })
           .then(function (text) {
-            self = text;
+            self = JSON.parse(text).last;
             document.body.addEventListener("click", HandleLove);
           });
       });
@@ -90,5 +95,14 @@
   </head>
   <body class="unchecked">
     <div id="status">click<br>???</div>
+    <div id="fingerprint"></div>
+    <script>
+      function whoami() {
+        let ua = window.navigator.userAgent;
+        return ua;
+      }
+      let fin = document.getElementById("fingerprint");
+      fin.innerText = whoami();
+    </script>
   </body>
 </html>
