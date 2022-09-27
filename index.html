@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+  <head>
+    <title>telempathy... you could know</title>
+    <style>
+      body {
+        font-size: 14pt;
+        font-family: sans-serif;
+        background: grey;
+        color: white;
+        min-height: 100vh;
+      }
+
+      #status {
+        font-size: 100pt;
+        text-align: center;
+      }
+
+      body.unchecked {
+        cursor: help;
+      }
+
+      body.requited {
+        background-color: #E97D9E;
+      }
+
+      body.unrequited {
+        background-color: #6DC4DA;
+      }
+    </style>
+    <script>
+
+      function refreshLoop() {
+        fetch("/last")
+          .then(function (res) {
+            return res.text()
+          })
+          .then(function (text) {
+            last = JSON.parse(text);
+
+            if (last.last != self) {
+              document.body.className = "requited";
+              let el = document.getElementById("status");
+              el.innerText = "someone clicked here recently";
+            } else {
+              setTimeout(refreshLoop, 1000);
+            }
+          });
+      }
+
+      // CLICK
+      function HandleLove () {
+
+        let el = document.getElementById("status");
+
+        fetch("/love")
+          .then(function (res) {
+            return res.text();
+          })
+          .then(function (text) {
+            let result = JSON.parse(text);
+            if (result.last == self) {
+              el.innerText = "you clicked here recently";
+            } else {
+              document.body.className = result.thoughtof ? "requited" : "unrequited";
+              el.innerText = result.thoughtof ? "someone clicked here recently" : "no one clicked here recently";
+            }
+            refreshLoop();
+          });
+
+        document.body.removeEventListener("click", HandleLove);
+      }
+
+
+      var self = undefined;
+
+      // ... //
+
+      window.addEventListener("load", function () {
+        fetch("/whoami")
+          .then(function (res) {
+            return res.text();
+          })
+          .then(function (text) {
+            self = text;
+            document.body.addEventListener("click", HandleLove);
+          });
+      });
+    </script>
+  </head>
+  <body class="unchecked">
+    <div id="status">click<br>???</div>
+  </body>
+</html>
