@@ -1,8 +1,7 @@
-package main
+package server
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"net"
 	"net/http"
@@ -24,19 +23,7 @@ type TouchResponse struct {
 	ThoughtOf bool   `json:"thoughtof"`
 }
 
-// Globals
-
-var (
-	LastTouch Touch
-	port      = flag.Int("port", 80, "number of port")
-	waitTime  = flag.Int("wait-time", 69*60, "number of seconds to wait")
-)
-
-//go:embed index.html
-var IndexHtml string
-
-//go:embed favicon.ico
-var FavIconIco string
+var LastTouch Touch
 
 func WhoIsFromRequest(r *http.Request) (string, error) {
 
@@ -46,13 +33,13 @@ func WhoIsFromRequest(r *http.Request) (string, error) {
 	return host + "//" + ua, nil
 }
 
-func main() {
+//go:embed index.html
+var IndexHtml string
 
-	flag.Parse()
+//go:embed favicon.ico
+var FavIconIco string
 
-	fmt.Println("port ........", *port)
-	fmt.Println("wait time ...", *waitTime)
-
+func NewServer(waitTime time.Duration) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/whoami", func(w http.ResponseWriter, r *http.Request) {
@@ -75,7 +62,7 @@ func main() {
 
 		id, _ := WhoIsFromRequest(r)
 		now := time.Now().UTC()
-		past := time.Now().UTC().Add(-time.Duration(*waitTime) * time.Second)
+		past := time.Now().UTC().Add(-waitTime)
 
 		lastWho := LastTouch.Who
 		lastWhen := LastTouch.When
@@ -94,7 +81,6 @@ func main() {
 		}
 		encoded, _ := json.Marshal(resp)
 		fmt.Fprint(w, string(encoded))
-
 	})
 
 	mux.HandleFunc("/favicon.ico", func(w http.ResponseWriter, req *http.Request) {
@@ -109,5 +95,5 @@ func main() {
 		fmt.Fprint(w, IndexHtml)
 	})
 
-	http.ListenAndServe(fmt.Sprintf(":%d", *port), mux)
+	return mux
 }
