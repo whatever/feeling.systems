@@ -12,8 +12,10 @@ import (
 	_ "embed"
 )
 
-// Globals
+//go:embed SPLASH
+var Splash string
 
+// Globals
 var (
 	port     = flag.Int("port", 80, "number of port")
 	waitTime = flag.Int("wait-time", 69*60, "number of seconds to wait")
@@ -22,6 +24,9 @@ var (
 func main() {
 	flag.Parse()
 
+	fmt.Println(Splash)
+	fmt.Println("")
+	fmt.Println("")
 	fmt.Println("port ........", *port)
 	fmt.Println("wait time ...", *waitTime)
 
