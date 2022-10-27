@@ -5,7 +5,7 @@ const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 module.exports = {
   entry: "./src/index.js",
   output: {
-    path: path.resolve(__dirname, "../server/server/static"),
+    path: path.resolve(__dirname, "../go/server/"),
     filename: "feeling-systems.bundled.js",
     libraryTarget: "var",
     library: "plz",

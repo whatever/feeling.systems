@@ -2,109 +2,10 @@
 <html>
   <head>
     <title>telempathy... i can feel it</title>
-    <style>
-      body {
-        font-size: 14pt;
-        font-family: sans-serif;
-        background: grey;
-        color: white;
-        min-height: 100vh;
-      }
-
-      #status {
-        font-size: 100pt;
-        text-align: center;
-      }
-
-      body.unchecked {
-        cursor: help;
-      }
-
-      body.requited {
-        background-color: #E97D9E;
-      }
-
-      body.unrequited {
-        background-color: #6DC4DA;
-      }
-
-      #fingerprint {
-        position: fixed;
-        left: 0.25em;
-        bottom: 0.25em;
-      }
-
-      .wavy {
-        font-size: 100px;
-        filter: url(#displacementFilter)
-      }
-      #you-wont-believe-this {
-        position: fixed;
-        bottom: 0px;
-        left: 40px;
-      }
-    </style>
-    <script>
-      function refreshLoop() {
-        fetch("/last")
-          .then(function (res) {
-            return res.text()
-          })
-          .then(function (text) {
-            last = JSON.parse(text);
-
-            if (last.last != self) {
-              document.body.className = "requited";
-              let el = document.getElementById("status");
-              el.innerText = "someone clicked here recently";
-            } else {
-              setTimeout(refreshLoop, 1000);
-            }
-          });
-      }
-
-      // CLICK
-      function HandleLove () {
-
-        let el = document.getElementById("status");
-
-        fetch("/love")
-          .then(function (res) {
-            return res.text();
-          })
-          .then(function (text) {
-            let result = JSON.parse(text);
-            if (result.last == self) {
-              el.innerText = "you clicked here recently";
-            } else {
-              document.body.className = result.thoughtof ? "requited" : "unrequited";
-              el.innerText = result.thoughtof ? "someone clicked here recently" : "no one clicked here recently";
-            }
-            refreshLoop();
-          });
-
-        document.body.removeEventListener("click", HandleLove);
-      }
-
-
-      var self = undefined;
-
-      // ... //
-
-      window.addEventListener("load", function () {
-        fetch("/whoami")
-          .then(function (res) {
-            return res.text();
-          })
-          .then(function (text) {
-            self = JSON.parse(text).last;
-            document.body.addEventListener("click", HandleLove);
-          });
-      });
-    </script>
+    <link rel="stylesheet" href="/style.css">
+    <script src="/feeling-systems.bundled.js"></script>
   </head>
   <body class="unchecked">
-    <div id="status">click<br>???</div>
     <div id="fingerprint"></div>
     <script>
       function whoami() {
@@ -115,8 +16,7 @@
       fin.innerText = whoami();
     </script>
 
-    <!-- swag? -->
-    <svg
+      <svg
       width="600"
       height="350"
       viewBox="0 0 600 350"
@@ -125,43 +25,49 @@
       >
       <filter id="displacementFilter">
       <feTurbulence
-        type="turbulence"
-        baseFrequency="0.010"
-        numOctaves="2"
-        result="turbulence" />
+      type="turbulence"
+      baseFrequency="0.010"
+      numOctaves="2"
+      result="turbulence" />
       <feOffset 
-        in="turbulence"
-        dx="100"
-        dy="0"
-        result="offy"
-        id="offy"
-        />
+      in="turbulence"
+      dx="100"
+      dy="0"
+      result="offy"
+      id="offy"
+      />
       <feDisplacementMap
-        in2="offy"
-        in="SourceGraphic"
-        scale="26"
-        xChannelSelector="R"
-        yChannelSelector="G"
-        id="displacey"
-        />
+      in2="offy"
+      in="SourceGraphic"
+      scale="26"
+      xChannelSelector="R"
+      yChannelSelector="G"
+      id="displacey"
+      />
       </filter>
 
-      <!-- <circle cx="100" cy="100" r="100" style="filter: url(#displacementFilter)" /> -->
-      <text x="0" y="100" class="wavy">you won'</text>
-      <text x="0" y="200" class="wavy">t believe</text>
-      <text x="0" y="300" class="wavy">this</text>
+      <g id="text-me-so-hard">
+        <text x="0" y="100" class="wavy">you won'</text>
+        <text x="0" y="200" class="wavy">t believe</text>
+        <text x="0" y="300" class="wavy">this</text>
+      </g>
 
-    </svg>
+      </svg>
+
+    <div id="message-box">
+      WRITE A MESSAGE!!?
+      <form method="POST" action="/write" id="write-a-message">
+        <textarea cols="12" rows="4" wrap="hard" maxlength="48" id="message"></textarea>
+        <input type="submit">
+      </form>
+    </div>
 
     <script>
+
+      /*
       let svg = document.getElementById("offy");
       let dis = document.getElementById("displacey");
       let scale = 1.0;
-
-      window.addEventListener("mousemove", function (ev) {
-        let y = ev.clientY;
-        scale = (y/window.innerHeight)*52;
-      });
 
       (function move() {
         let t = +new Date() / 1000.0;
@@ -174,6 +80,7 @@
         dis.scale.baseVal = (1.0+Math.cos(t/3.0+500))*0.5*22;
         dis.scale.baseVal = 26.0;
       }());
+       */
     </script>
   </body>
 </html>

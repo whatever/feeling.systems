@@ -1,0 +1,55 @@
+body {
+  font-size: 14pt;
+  font-family: sans-serif;
+  background: grey;
+  color: white;
+  min-height: 100vh;
+}
+
+#status {
+  font-size: 100pt;
+  text-align: center;
+}
+
+body.unchecked {
+  cursor: help;
+}
+
+body.requited {
+  background-color: #E97D9E;
+}
+
+body.unrequited {
+  background-color: #6DC4DA;
+}
+
+#fingerprint {
+  position: fixed;
+  left: 0.25em;
+  bottom: 0.25em;
+  display: none;
+}
+
+.wavy {
+  font-size: 100px;
+  filter: url(#displacementFilter)
+}
+
+#you-wont-believe-this {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: -1000;
+}
+
+#message-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  border: solid 1px black;
+  height: 200px;
+  width: 400px;
+  padding: 0.25em;
+  margin-top: -100px;
+  margin-left: -200px;
+}
