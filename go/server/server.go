@@ -9,6 +9,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gorilla/websocket"
+
 	_ "embed"
 )
 
@@ -19,6 +21,15 @@ type Message struct {
 	Message string     `json:"message"`
 	Nonce   string     `json:"nonce"`
 	Mutex   sync.Mutex `json:"-"`
+}
+
+func (msg *Message) Json() []byte {
+	var response TouchResponse
+	response.Who = msg.Who
+	response.When = msg.When.Unix()
+	response.Message = msg.Message
+	encoded, _ := json.Marshal(response)
+	return encoded
 }
 
 // Message represents a update from a user on the internet.
@@ -72,8 +83,26 @@ var IndexHtml string
 //go:embed favicon.ico
 var FavIconIco string
 
+// Upgrader!
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
+
+// NewServer returns a mux-server with all the routes attached.
 func NewServer(waitTime time.Duration) http.Handler {
+	caster := NewBroadcaster()
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("/holding", func(w http.ResponseWriter, r *http.Request) {
+		conn, err := upgrader.Upgrade(w, r, nil)
+
+		if err != nil {
+			return
+		}
+
+		caster.Add(conn)
+	})
 
 	mux.HandleFunc("/touch", func(w http.ResponseWriter, r *http.Request) {
 
@@ -108,6 +137,10 @@ func NewServer(waitTime time.Duration) http.Handler {
 
 		encoded, _ := json.Marshal(response)
 		fmt.Fprint(w, string(encoded))
+
+		go func() {
+			caster.SendAll(LastMessage.Json())
+		}()
 	})
 
 	mux.HandleFunc("/whoami", func(w http.ResponseWriter, r *http.Request) {
@@ -119,12 +152,7 @@ func NewServer(waitTime time.Duration) http.Handler {
 	})
 
 	mux.HandleFunc("/last", func(w http.ResponseWriter, r *http.Request) {
-		var response TouchResponse
-		response.Who = LastMessage.Who
-		response.When = LastMessage.When.Unix()
-		response.Message = LastMessage.Message
-		encoded, _ := json.Marshal(response)
-		fmt.Fprint(w, string(encoded))
+		fmt.Fprint(w, string(LastMessage.Json()))
 	})
 
 	mux.HandleFunc("/love", func(w http.ResponseWriter, r *http.Request) {

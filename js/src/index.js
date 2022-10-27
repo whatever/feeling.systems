@@ -1,28 +1,7 @@
-console.log("" +
-`  ______                     __  __
- /      \\                   /  |/  |
-/$$$$$$  |______    ______  $$ |$$/  _______    ______
-$$ |_ $$//      \\  /      \\ $$ |/  |/       \\  /      \\
-$$   |  /$$$$$$  |/$$$$$$  |$$ |$$ |$$$$$$$  |/$$$$$$  |
-$$$$/   $$    $$ |$$    $$ |$$ |$$ |$$ |  $$ |$$ |  $$ |
-$$ |    $$$$$$$$/ $$$$$$$$/ $$ |$$ |$$ |  $$ |$$ \\__$$ |
-$$ |    $$       |$$       |$$ |$$ |$$ |  $$ |$$    $$ |
-$$/      $$$$$$$/  $$$$$$$/ $$/ $$/ $$/   $$/  $$$$$$$ |
-                                              /  \\__$$ |
-                                              $$    $$/
-                                               $$$$$$/
-                                 __
-                                /  |
-  _______  __    __   _______  _$$ |_     ______   _____  ____    _______
- /       |/  |  /  | /       |/ $$   |   /      \\ /     \\/    \\  /       |
-/$$$$$$$/ $$ |  $$ |/$$$$$$$/ $$$$$$/   /$$$$$$  |$$$$$$ $$$$  |/$$$$$$$/
-$$      \\ $$ |  $$ |$$      \\   $$ | __ $$    $$ |$$ | $$ | $$ |$$      \\
- $$$$$$  |$$ \\__$$ | $$$$$$  |  $$ |/  |$$$$$$$$/ $$ | $$ | $$ | $$$$$$  |
-/     $$/ $$    $$ |/     $$/   $$  $$/ $$       |$$ | $$ | $$ |/     $$/
-$$$$$$$/   $$$$$$$ |$$$$$$$/     $$$$/   $$$$$$$/ $$/  $$/  $$/ $$$$$$$/
-          /  \\__$$ |
-          $$    $$/
-           $$$$$$/`);
+import message from "./feeling-systems.txt";
+
+console.log(message);
+
 
 /**
  * expand
@@ -56,7 +35,7 @@ function write(lines) {
     let el = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     el.setAttribute("x", "0");
     el.setAttribute("y", y.toString());
-    el.setAttribute("class", "wavy");
+    el.setAttribute("xml:space", "preserve");
     el.textContent = line;
     textMeSoHard.appendChild(el);
   });
@@ -75,9 +54,11 @@ function updateScale(t) {
     return;
   }
 
+  let speed = 1.0/60.0/24.0;
+  speed = 20.0;
   let now = +new Date()/1000.0;
-  let scale = (now - t)/60.0/24.0 + 2.0;
-  dis.scale.baseVal = Math.min(scale, 50.0);
+  let scale = (now - t)*speed;
+  dis.scale.baseVal = Math.min(scale, 80.0);
 }
 
 (function loopUpdateScale() {
@@ -85,29 +66,21 @@ function updateScale(t) {
   updateScale(lastTouch.when);
 }());
 
-/**
- * refreshLoop
- * Loop
- */
-function refreshLoop() {
-  fetch("/last")
-    .then(function (res) {
-      return res.text()
-    })
-    .then(function (text) {
-      lastTouch = JSON.parse(text);
-      write(expand(lastTouch.message));
-      setTimeout(refreshLoop, 1000);
-      let messageBox = document.getElementById("message-box");
-      messageBox.className = lastTouch.last === self ? "hidden" : "";
-    });
-}
-
 
 let self = undefined;
 
 
 let textMeOSoHard = undefined;
+
+
+// update
+//
+// Update DOM
+function update() {
+  write(expand(lastTouch.message));
+  let messageBox = document.getElementById("message-box");
+  messageBox.className = lastTouch.last === self ? "hidden" : "";
+}
 
 
 window.addEventListener("load", () => {
@@ -128,6 +101,8 @@ window.addEventListener("load", () => {
       nonce: "nvm",
     };
 
+    // Touch
+
     fetch("/touch", {
       method: "POST",
       headers: {
@@ -138,6 +113,7 @@ window.addEventListener("load", () => {
     }).then((text) => {
       return text.json();
     }).then((resp) => {
+      lastTouch = resp;
     });
 
     return false;
@@ -151,6 +127,27 @@ window.addEventListener("load", () => {
     })
     .then(function (text) {
       self = JSON.parse(text).last;
-      refreshLoop();
     });
+
+
+  let url = location.origin.replace("http", "ws") + "/holding";
+
+  let ws = new WebSocket(url);
+
+  ws.addEventListener("open", (ev) => {
+    console.log("open =", ev);
+  });
+
+  ws.addEventListener("close", (ev) => {
+    console.log("close =", ev);
+  });
+
+  ws.addEventListener("message", (ev) => {
+    lastTouch = JSON.parse(ev.data);
+    update();
+  });
+
+  ws.addEventListener("error", (ev) => {
+    console.log("error =", ev);
+  });
 });

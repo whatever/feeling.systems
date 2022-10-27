@@ -26,7 +26,11 @@ module.exports = {
         loader: 'raw-loader',
       },
       {
-        test: /\.(frag|vert|txt)?$/,
+        test: /\.txt$/,
+        type: "asset/source",
+      },
+      {
+        test: /\.(frag|vert)?$/,
         loader: 'raw-loader',
       },
     ],

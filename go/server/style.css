@@ -1,9 +1,12 @@
+html, body {
+  margin: 0;
+}
+
 body {
   font-size: 14pt;
   font-family: sans-serif;
   background: grey;
   color: white;
-  min-height: 100vh;
 }
 
 #status {
@@ -40,6 +43,9 @@ body.unrequited {
   top: 0px;
   left: 0px;
   z-index: -1000;
+  white-space: pre;
+
+  height: 100%;
 }
 
 #message-box {
@@ -59,5 +65,5 @@ body.unrequited {
 }
 
 .hidden {
-  display: none;
+  /* display: none; */
 }
