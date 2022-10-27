@@ -63,24 +63,17 @@
     </div>
 
     <script>
-
-      /*
       let svg = document.getElementById("offy");
-      let dis = document.getElementById("displacey");
       let scale = 1.0;
 
       (function move() {
+        requestAnimationFrame(move);
         let t = +new Date() / 1000.0;
         let x = 10*Math.cos(t);
         let y = 10*Math.sin(t);
-
-        requestAnimationFrame(move);
         svg.dx.baseVal = x;
         svg.dy.baseVal = y;
-        dis.scale.baseVal = (1.0+Math.cos(t/3.0+500))*0.5*22;
-        dis.scale.baseVal = 26.0;
       }());
-       */
     </script>
   </body>
 </html>

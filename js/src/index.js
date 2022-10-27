@@ -1,5 +1,5 @@
-console.log(`
-  ______                     __  __
+console.log("" +
+`  ______                     __  __
  /      \\                   /  |/  |
 /$$$$$$  |______    ______  $$ |$$/  _______    ______
 $$ |_ $$//      \\  /      \\ $$ |/  |/       \\  /      \\
@@ -22,9 +22,12 @@ $$      \\ $$ |  $$ |$$      \\   $$ | __ $$    $$ |$$ | $$ | $$ |$$      \\
 $$$$$$$/   $$$$$$$ |$$$$$$$/     $$$$/   $$$$$$$/ $$/  $$/  $$/ $$$$$$$/
           /  \\__$$ |
           $$    $$/
-           $$$$$$/
-`);
+           $$$$$$/`);
 
+/**
+ * expand
+ * Return a list of strings from a text blob.
+ */
 function expand(text) {
   let textarea = document.getElementById("message");
   let ncols = textarea.cols;
@@ -36,9 +39,51 @@ function expand(text) {
     }
     res.push(line);
   });
-
   return res;
 }
+
+
+/**
+ * write
+ * Replace svg text with multiple lines from an array of strings.
+ */
+function write(lines) {
+  let textMeSoHard = document.getElementById("text-me-so-hard");
+  textMeSoHard.innerHTML = "";
+  lines.forEach((line, i) => {
+    let x = 0;
+    let y = (i+1)*100;
+    let el = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    el.setAttribute("x", "0");
+    el.setAttribute("y", y.toString());
+    el.setAttribute("class", "wavy");
+    el.textContent = line;
+    textMeSoHard.appendChild(el);
+  });
+}
+
+let lastTouch = {};
+
+function updateScale(t) {
+  let dis = document.getElementById("displacey");
+
+  if (t === undefined || t < 0) {
+    return;
+  }
+
+  if (dis === undefined) {
+    return;
+  }
+
+  let now = +new Date()/1000.0;
+  let scale = 10.0*(now - t);
+  dis.scale.baseVal = scale;
+}
+
+(function loopUpdateScale() {
+  requestAnimationFrame(loopUpdateScale);
+  updateScale(lastTouch.when);
+}());
 
 /**
  * refreshLoop
@@ -51,34 +96,8 @@ function refreshLoop() {
     })
     .then(function (text) {
       last = JSON.parse(text);
-
-      let expanded = expand(last.message);
-
-      let textMeSoHard = document.getElementById("text-me-so-hard");
-      textMeSoHard.innerHTML = "";
-
-      expanded.forEach((line, i) => {
-        let x = 0;
-        let y = (i+1)*100;
-        let el = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        el.setAttribute("x", "0");
-        el.setAttribute("y", y.toString());
-        el.setAttribute("class", "wavy");
-        el.textContent = line;
-        textMeSoHard.appendChild(el);
-      });
-
-      // let el = document.getElementById("status");
-      // el.innerHTML = last.message;
-
-      /*
-      if (last.last != self) {
-        document.body.className = "requited";
-        let el = document.getElementById("status");
-        el.innerText = "someone clicked here recently";
-      } else {
-      }
-      */
+      lastTouch = last;
+      write(expand(last.message));
       setTimeout(refreshLoop, 1000);
     });
 }
@@ -86,11 +105,6 @@ function refreshLoop() {
 
 let self = undefined;
 let textMeOSoHard = undefined;
-
-
-function write() {
-  // console.log(textMeOSoHard);
-}
 
 
 window.addEventListener("load", () => {
@@ -121,7 +135,6 @@ window.addEventListener("load", () => {
     }).then((text) => {
       return text.json();
     }).then((resp) => {
-      write("...ok");
     });
 
     return false;
