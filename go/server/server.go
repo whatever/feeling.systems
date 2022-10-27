@@ -106,7 +106,7 @@ func NewServer(waitTime time.Duration) http.Handler {
 			return
 		}
 
-		caster.Add(conn)
+		caster.Add(conn, id)
 		caster.Send(conn, LastMessage.Json())
 	})
 

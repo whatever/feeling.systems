@@ -2,25 +2,15 @@
 <html>
   <head>
     <title>telempathy... i can feel it</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="/style.css">
     <script src="/feeling-systems.bundled.js"></script>
   </head>
-  <body class="unchecked">
-    <div id="fingerprint"></div>
-    <script>
-      function whoami() {
-        let ua = window.navigator.userAgent;
-        return ua;
-      }
-      let fin = document.getElementById("fingerprint");
-      fin.innerText = whoami();
-    </script>
 
-      <svg
-      viewBox="0 0 600 600"
-      xmlns="http://www.w3.org/2000/svg"
-      id="you-wont-believe-this"
-      >
+  <body class="unchecked">
+
+    <!-- MESSAGE -->
+    <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" id="you-wont-believe-this">
       <filter id="displacementFilter">
       <feTurbulence
         type="turbulence"
@@ -36,31 +26,30 @@
         id="offy"
         />
       <feDisplacementMap
-      in2="offy"
-      in="SourceGraphic"
-      scale="26"
-      xChannelSelector="R"
-      yChannelSelector="G"
-      id="displacey"
-      />
+        in2="offy"
+        in="SourceGraphic"
+        scale="26"
+        xChannelSelector="R"
+        yChannelSelector="G"
+        id="displacey"
+        />
       </filter>
+      <g id="text-me-so-hard" class="wavy"></g>
+    </svg>
 
-      <g id="text-me-so-hard" class="wavy"><!--
-        <text x="0" y="100" class="wavy">you won'</text>
-        <text x="0" y="200" class="wavy">t believe</text>
-        <text x="0" y="300" class="wavy">this</text>
-      --></g>
-
-      </svg>
-
+    <!-- FORM -->
     <div id="message-box" class="hidden">
-      WRITE A MESSAGE!!?
-      <form method="POST" action="/write" id="write-a-message">
-        <textarea cols="12" rows="4" wrap="hard" maxlength="48" id="message"></textarea>
-        <input type="submit">
-      </form>
+      <form method="POST" action="/write" id="write-a-message"><textarea
+          value="leave\na\nmess\nage"
+          cols="12"
+          rows="4"
+          wrap="hard"
+          maxlength="48"
+          id="message"
+          ></textarea><input type="submit" value="send a missive" id="submitter"></form>
     </div>
 
+    <!-- ANIMATION for MESSAGE -->
     <script>
       let svg = document.getElementById("offy");
       let scale = 1.0;

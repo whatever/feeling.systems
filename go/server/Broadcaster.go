@@ -8,24 +8,24 @@ import (
 )
 
 type Broadcaster struct {
-	Connections map[*websocket.Conn]bool
+	Connections map[*websocket.Conn]string
 	Mutex       sync.RWMutex
 }
 
 // Add stores a connection and keeps it alive.
-func (caster *Broadcaster) Add(conn *websocket.Conn) {
+func (caster *Broadcaster) Add(conn *websocket.Conn, id string) {
 
 	caster.Mutex.Lock()
-	caster.Connections[conn] = true
+	caster.Connections[conn] = id
 	caster.Mutex.Unlock()
 
 	go func() {
 		// Auto-remove
 		defer func() {
-			log.Println("Closing connection")
+			log.Printf("closing connection for %s", id)
 			conn.Close()
 			caster.Mutex.Lock()
-			caster.Connections[conn] = false
+			caster.Connections[conn] = ""
 			delete(caster.Connections, conn)
 			defer caster.Mutex.Unlock()
 		}()
@@ -48,10 +48,8 @@ func (caster *Broadcaster) Send(conn *websocket.Conn, message []byte) {
 func (caster *Broadcaster) SendAll(message []byte) {
 	caster.Mutex.RLock()
 	defer caster.Mutex.RUnlock()
-	for conn, ok := range caster.Connections {
-		if ok {
-			caster.Send(conn, message)
-		}
+	for conn, _ := range caster.Connections {
+		caster.Send(conn, message)
 	}
 }
 
@@ -60,6 +58,6 @@ func (caster *Broadcaster) SendAll(message []byte) {
 // ...
 func NewBroadcaster() *Broadcaster {
 	return &Broadcaster{
-		Connections: make(map[*websocket.Conn]bool, 1000),
+		Connections: make(map[*websocket.Conn]string, 1000),
 	}
 }

@@ -19,7 +19,7 @@ function expand(text) {
     }
     res.push(line);
   });
-  return res;
+  return res.slice(0, 4);
 }
 
 
@@ -81,6 +81,7 @@ function update() {
   write(expand(lastTouch.message));
   let messageBox = document.getElementById("message-box");
   messageBox.className = lastTouch.last === self ? "hidden" : "";
+  document.body.className = lastTouch.last === self ? "unrequited" : "requited";
 }
 
 
@@ -116,6 +117,8 @@ window.addEventListener("load", () => {
     }).then((resp) => {
       // XXX: ???
     });
+
+    document.activeElement.blur();
 
     return false;
   });
