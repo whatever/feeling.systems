@@ -1,5 +1,6 @@
 import message from "./feeling-systems.txt";
 
+
 console.log(message);
 
 
@@ -54,10 +55,10 @@ function updateScale(t) {
     return;
   }
 
-  let speed = 1.0/60.0/24.0;
-  speed = 20.0;
+  let speed = 26.0/60.0/60.0/24.0;
   let now = +new Date()/1000.0;
-  let scale = (now - t)*speed;
+  let scale = (now - t)*speed + 2.0;
+
   dis.scale.baseVal = Math.min(scale, 80.0);
 }
 
@@ -113,7 +114,7 @@ window.addEventListener("load", () => {
     }).then((text) => {
       return text.json();
     }).then((resp) => {
-      lastTouch = resp;
+      // XXX: ???
     });
 
     return false;
@@ -127,27 +128,29 @@ window.addEventListener("load", () => {
     })
     .then(function (text) {
       self = JSON.parse(text).last;
+      update();
     });
-
 
   let url = location.origin.replace("http", "ws") + "/holding";
 
   let ws = new WebSocket(url);
 
   ws.addEventListener("open", (ev) => {
-    console.log("open =", ev);
+    // console.log("open =", ev);
   });
 
   ws.addEventListener("close", (ev) => {
-    console.log("close =", ev);
+    // console.log("close =", ev);
   });
 
   ws.addEventListener("message", (ev) => {
     lastTouch = JSON.parse(ev.data);
+    // console.log("lastTouch =", lastTouch);
+    // console.log(lastTouch);
     update();
   });
 
   ws.addEventListener("error", (ev) => {
-    console.log("error =", ev);
+    // console.log("error =", ev);
   });
 });

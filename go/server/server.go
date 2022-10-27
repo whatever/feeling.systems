@@ -95,6 +95,11 @@ func NewServer(waitTime time.Duration) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/holding", func(w http.ResponseWriter, r *http.Request) {
+
+		id, _ := WhoIsFromRequest(r)
+
+		log.Printf("/holding by %s", id)
+
 		conn, err := upgrader.Upgrade(w, r, nil)
 
 		if err != nil {
@@ -102,6 +107,7 @@ func NewServer(waitTime time.Duration) http.Handler {
 		}
 
 		caster.Add(conn)
+		caster.Send(conn, LastMessage.Json())
 	})
 
 	mux.HandleFunc("/touch", func(w http.ResponseWriter, r *http.Request) {
@@ -128,6 +134,8 @@ func NewServer(waitTime time.Duration) http.Handler {
 		// lastWho := LastTouch.Who
 		// lastWhen := LastTouch.When
 
+		// XXX: Only update if it's a new person
+
 		// Update
 		LastMessage.Mutex.Lock()
 		LastMessage.Who = id
@@ -144,6 +152,11 @@ func NewServer(waitTime time.Duration) http.Handler {
 	})
 
 	mux.HandleFunc("/whoami", func(w http.ResponseWriter, r *http.Request) {
+
+		id, _ := WhoIsFromRequest(r)
+
+		log.Printf("/whoami by %s", id)
+
 		var response TouchResponse
 		response.Who, _ = WhoIsFromRequest(r)
 		response.When = time.Now().UTC().Unix()
@@ -153,31 +166,6 @@ func NewServer(waitTime time.Duration) http.Handler {
 
 	mux.HandleFunc("/last", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, string(LastMessage.Json()))
-	})
-
-	mux.HandleFunc("/love", func(w http.ResponseWriter, r *http.Request) {
-
-		id, _ := WhoIsFromRequest(r)
-		now := time.Now().UTC()
-		past := time.Now().UTC().Add(-waitTime)
-
-		lastWho := LastTouch.Who
-		lastWhen := LastTouch.When
-
-		// Update
-		LastTouch.Mutex.Lock()
-		LastTouch.Who = id
-		LastTouch.When = now
-		LastTouch.Mutex.Unlock()
-
-		// Build response
-		resp := TouchResponse{
-			Who:       lastWho,
-			When:      lastWhen.Unix(),
-			ThoughtOf: lastWho != id && lastWhen.After(past),
-		}
-		encoded, _ := json.Marshal(resp)
-		fmt.Fprint(w, string(encoded))
 	})
 
 	mux.HandleFunc("/style.css", func(w http.ResponseWriter, req *http.Request) {
