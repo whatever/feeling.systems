@@ -77,7 +77,9 @@ func NewServer(waitTime time.Duration) http.Handler {
 
 	mux.HandleFunc("/touch", func(w http.ResponseWriter, r *http.Request) {
 
-		log.Println("/touch")
+		id, _ := WhoIsFromRequest(r)
+
+		log.Printf("/touch by %s", id)
 
 		if r.Method != "POST" {
 			return
@@ -92,13 +94,10 @@ func NewServer(waitTime time.Duration) http.Handler {
 		decoder.Decode(&message)
 
 		// Get updates ready
-		id, _ := WhoIsFromRequest(r)
 		now := time.Now().UTC()
 		// past := time.Now().UTC().Add(-waitTime)
 		// lastWho := LastTouch.Who
 		// lastWhen := LastTouch.When
-
-		log.Printf("%s reached out", id)
 
 		// Update
 		LastMessage.Mutex.Lock()
@@ -106,8 +105,6 @@ func NewServer(waitTime time.Duration) http.Handler {
 		LastMessage.When = now
 		LastMessage.Message = message.Message
 		LastMessage.Mutex.Unlock()
-
-		log.Println(LastMessage)
 
 		encoded, _ := json.Marshal(response)
 		fmt.Fprint(w, string(encoded))

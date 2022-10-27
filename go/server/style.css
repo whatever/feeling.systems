@@ -57,3 +57,7 @@ body.unrequited {
 #message {
   font-size: 24pt;
 }
+
+.hidden {
+  display: none;
+}

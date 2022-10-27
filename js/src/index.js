@@ -76,8 +76,8 @@ function updateScale(t) {
   }
 
   let now = +new Date()/1000.0;
-  let scale = 10.0*(now - t);
-  dis.scale.baseVal = scale;
+  let scale = (now - t)/60.0/24.0 + 2.0;
+  dis.scale.baseVal = Math.min(scale, 50.0);
 }
 
 (function loopUpdateScale() {
@@ -95,15 +95,18 @@ function refreshLoop() {
       return res.text()
     })
     .then(function (text) {
-      last = JSON.parse(text);
-      lastTouch = last;
-      write(expand(last.message));
+      lastTouch = JSON.parse(text);
+      write(expand(lastTouch.message));
       setTimeout(refreshLoop, 1000);
+      let messageBox = document.getElementById("message-box");
+      messageBox.className = lastTouch.last === self ? "hidden" : "";
     });
 }
 
 
 let self = undefined;
+
+
 let textMeOSoHard = undefined;
 
 
