@@ -4,12 +4,14 @@
     <title>telempathy... i can feel it</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="/style.css">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
     <script src="/feeling-systems.bundled.js"></script>
   </head>
 
   <body class="unchecked">
 
     <!-- MESSAGE -->
+    <div id="vp">
     <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" id="you-wont-believe-this">
       <filter id="displacementFilter">
       <feTurbulence
@@ -36,16 +38,19 @@
       </filter>
       <g id="text-me-so-hard" class="wavy"></g>
     </svg>
+    </div>
 
     <!-- FORM -->
     <div id="message-box" class="hidden">
+      <div id="closer" class="hidden">&nbsp;<i class="fa fa-angle-double-down"></i><i class="fa fa-angle-double-down"></i><i class="fa fa-angle-double-down"></i></div>
       <form method="POST" action="/write" id="write-a-message"><textarea
           value="leave\na\nmess\nage"
           cols="12"
-          rows="4"
+          rows="6"
           wrap="hard"
-          maxlength="48"
+          maxlength="72"
           id="message"
+          placeholder="lmk what you think"
           ></textarea><input type="submit" value="send a missive" id="submitter"></form>
     </div>
 

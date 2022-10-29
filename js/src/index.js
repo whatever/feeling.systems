@@ -1,3 +1,4 @@
+import {whoami} from "./whoami.js";
 import message from "./feeling-systems.txt";
 
 
@@ -19,7 +20,7 @@ function expand(text) {
     }
     res.push(line);
   });
-  return res.slice(0, 4);
+  return res.slice(0, 6);
 }
 
 
@@ -74,56 +75,136 @@ let self = undefined;
 let textMeOSoHard = undefined;
 
 
+const DEBUG = false;
+
+
 // update
 //
 // Update DOM
 function update() {
-  write(expand(lastTouch.message));
+  write(expand(lastTouch.message || ""));
+
   let messageBox = document.getElementById("message-box");
-  messageBox.className = lastTouch.last === self ? "hidden" : "";
+  messageBox.className = (!DEBUG && lastTouch.last === self) ? "hidden" : "";
+
+  let closer = document.getElementById("closer");
+  closer.className = (!DEBUG && lastTouch.last === self) ? "hidden" : "";
+
   document.body.className = lastTouch.last === self ? "unrequited" : "requited";
 }
 
+
+// connect
+// connect
+// connect
+function connect() {
+
+  let url = location.origin.replace("http", "ws") + "/holding";
+
+  let ws = new WebSocket(url);
+
+  ws.addEventListener("open", (ev) => {
+  });
+
+  ws.addEventListener("message", (ev) => {
+    lastTouch = JSON.parse(ev.data);
+    update();
+  });
+
+  ws.addEventListener("error", (ev) => {
+  });
+
+  ws.addEventListener("close", (ev) => {
+    setTimeout(connect, 1000);
+  });
+}
+
+/**
+ * Handle Submit
+ *
+ * ...
+ */
+function handleSubmit(ev) {
+  ev.preventDefault();
+
+  let el = document.getElementById("message");
+
+  let payload = {
+    who: whoami(),
+    message: el.value || "",
+    nonce: "nvm",
+  };
+
+  // Touch
+
+  fetch("/touch", {
+    method: "POST",
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload),
+  }).then((text) => {
+    return text.json();
+  }).then((resp) => {
+    console.log("submit succeeded");
+  }).catch((err) => {
+    console.log("submit failed");
+    console.error(err);
+  });
+
+  document.activeElement.blur();
+  document.getElementById("message").value = "";
+  window.scrollTo(0, 0);
+
+  return false;
+}
+
+/**
+ * XXX: 
+function cascade(string) {
+  let lines = string.split("\n");
+
+  let res = [];
+
+  lines.forEach((line) => {
+    console.log(line.match(/.{1,12}/g));
+  });
+
+  console.log(lines);
+
+  return "";
+}
+*/
 
 window.addEventListener("load", () => {
 
   textMeOSoHard = document.getElementById("text-me-so-hard");
 
   let form = document.getElementById("write-a-message");
+  form.addEventListener("submit", handleSubmit);
 
-  // Attach submit event listener
-  form.addEventListener("submit", (ev) => {
+  /**
+   * XXX: ...
+  let message = document.getElementById("message");
+  let prevText = message.value;
+  message.addEventListener("input", (ev) => {
 
-    ev.preventDefault();
+    console.log("<<", prevText);
+    console.log(">>", ev.originalTarget.value);
 
-    let el = document.getElementById("message");
+    cascade("i only show girls that I love them");
 
-    let payload = {
-      message: el.value || "",
-      nonce: "nvm",
-    };
 
-    // Touch
+    let cur = message.selectionStart; 
 
-    fetch("/touch", {
-      method: "POST",
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload),
-    }).then((text) => {
-      return text.json();
-    }).then((resp) => {
-      // XXX: ???
-    });
+    let lines = expand(message.value);
+    message.value = lines.join("\n");
 
-    document.activeElement.blur();
-
-    return false;
+    message.focus();
+    message.setSelectionRange(cur, cur);
   });
-
-  // Who am I?
+  */
 
   fetch("/whoami")
     .then(function (res) {
@@ -134,26 +215,7 @@ window.addEventListener("load", () => {
       update();
     });
 
-  let url = location.origin.replace("http", "ws") + "/holding";
+  connect();
 
-  let ws = new WebSocket(url);
-
-  ws.addEventListener("open", (ev) => {
-    // console.log("open =", ev);
-  });
-
-  ws.addEventListener("close", (ev) => {
-    // console.log("close =", ev);
-  });
-
-  ws.addEventListener("message", (ev) => {
-    lastTouch = JSON.parse(ev.data);
-    // console.log("lastTouch =", lastTouch);
-    // console.log(lastTouch);
-    update();
-  });
-
-  ws.addEventListener("error", (ev) => {
-    // console.log("error =", ev);
-  });
+  console.log("id ....... " + whoami());
 });

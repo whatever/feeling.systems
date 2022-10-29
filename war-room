@@ -1,0 +1,8 @@
+#!/bin/sh
+
+echo "let's go"
+
+tmux \
+  new-session  "cd go/ && go run cmd/server.go -port 8081" \; \
+  split-window "cd js/ && npm run lmao" \; \
+  select-layout even-vertical

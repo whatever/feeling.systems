@@ -1,45 +1,25 @@
-<!doctype html>
+<!DOCTYPE HTML>
 <html>
   <head>
-    <title>i can feel it</title>
-    <!-- <link href="/patr0nage.css" rel="stylesheet"> -->
+    <title>telempathy... i can feel it</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/style.css">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
     <script src="/feeling-systems.bundled.js"></script>
-    <script>
-    </script>
-    <style>
-    body {
-      font-size: 14pt;
-      font-family: sans-serif;
-    }
-    .wavy {
-      font-size: 100px;
-      filter: url(#displacementFilter)
-    }
-    #you-wont-believe-this {
-      position: fixed;
-      bottom: 0px;
-      left: 40px;
-    }
-    </style>
   </head>
-  <body>
-    <!--
-      <pre>pr0m</pre>
-      what's next?
-    -->
-    <svg
-      width="600"
-      height="350"
-      viewBox="0 0 600 350"
-      xmlns="http://www.w3.org/2000/svg"
-      id="you-wont-believe-this"
-      >
+
+  <body class="unchecked">
+
+    <!-- MESSAGE -->
+    <div id="vp">
+    <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" id="you-wont-believe-this">
       <filter id="displacementFilter">
       <feTurbulence
         type="turbulence"
         baseFrequency="0.010"
         numOctaves="2"
-        result="turbulence" />
+        result="turbulence"
+        />
       <feOffset 
         in="turbulence"
         dx="100"
@@ -56,35 +36,37 @@
         id="displacey"
         />
       </filter>
-
-      <!-- <circle cx="100" cy="100" r="100" style="filter: url(#displacementFilter)" /> -->
-      <text x="0" y="100" class="wavy">you won'</text>
-      <text x="0" y="200" class="wavy">t believe</text>
-      <text x="0" y="300" class="wavy">this</text>
-
+      <g id="text-me-so-hard" class="wavy"></g>
     </svg>
+    </div>
 
+    <!-- FORM -->
+    <div id="message-box" class="hidden">
+      <div id="closer" class="hidden">&nbsp;<i class="fa fa-angle-double-down"></i><i class="fa fa-angle-double-down"></i><i class="fa fa-angle-double-down"></i></div>
+      <form method="POST" action="/write" id="write-a-message"><textarea
+          value="leave\na\nmess\nage"
+          cols="12"
+          rows="6"
+          wrap="hard"
+          maxlength="72"
+          id="message"
+          placeholder="lmk what you think"
+          ></textarea><input type="submit" value="send a missive" id="submitter"></form>
+    </div>
+
+    <!-- ANIMATION for MESSAGE -->
     <script>
       let svg = document.getElementById("offy");
-      let dis = document.getElementById("displacey");
       let scale = 1.0;
 
-      window.addEventListener("mousemove", function (ev) {
-        let y = ev.clientY;
-        scale = (y/window.innerHeight)*52;
-      });
-
       (function move() {
+        requestAnimationFrame(move);
         let t = +new Date() / 1000.0;
         let x = 10*Math.cos(t);
         let y = 10*Math.sin(t);
-
-        requestAnimationFrame(move);
         svg.dx.baseVal = x;
         svg.dy.baseVal = y;
-        dis.scale.baseVal = (1.0+Math.cos(t/3.0+500))*0.5*22;
       }());
     </script>
-
   </body>
 </html>

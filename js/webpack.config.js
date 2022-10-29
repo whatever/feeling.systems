@@ -40,5 +40,16 @@ module.exports = {
     new NodePolyfillPlugin({
       excludeAliases: ["console"]
     }),
-  ]
+  ],
+  devServer: {
+    bonjour: true,
+    proxy: {
+      "/holding": {
+        target: "ws://localhost:8081",
+        ws: true,
+      },
+      "/touch": "http://localhost:8081",
+      "/whoami": "http://localhost:8081",
+    }
+  },
 }
