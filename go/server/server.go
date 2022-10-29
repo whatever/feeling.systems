@@ -16,7 +16,7 @@ import (
 
 // Message represents a update from a user on the internet.
 type Message struct {
-	Who     string     `json:"last"`
+	Who     string     `json:"who"`
 	When    time.Time  `json:"when"`
 	Message string     `json:"message"`
 	Nonce   string     `json:"nonce"`
@@ -32,38 +32,19 @@ func (msg *Message) Json() []byte {
 	return encoded
 }
 
-// Message represents a update from a user on the internet.
-type MessageWrite struct {
-	Message string    `json:"message"`
-	Who     string    `json:"last"`
-	When    time.Time `json:"when"`
-	Nonce   string    `json:"nonce"`
-}
-
 // MessageResponse represents the server response from a Message.
 type MessageResponse struct {
 	Success bool   `json:"success"`
 	Error   string `json:"error"`
 }
 
-// Touch ...
-type Touch struct {
-	Message string
-	Who     string
-	When    time.Time
-	Mutex   sync.Mutex
-}
-
 // TouchResponse ...
 type TouchResponse struct {
-	Who       string `json:"last"`
+	Who       string `json:"who"`
 	When      int64  `json:"when"`
 	Message   string `json:"message"`
 	ThoughtOf bool   `json:"thoughtof"`
 }
-
-var LastTouch Touch
-var LastMessage Message
 
 func WhoIsFromRequest(r *http.Request) (string, error) {
 	host, _, _ := net.SplitHostPort(r.RemoteAddr)
@@ -91,6 +72,13 @@ var upgrader = websocket.Upgrader{
 
 // NewServer returns a mux-server with all the routes attached.
 func NewServer(waitTime time.Duration) http.Handler {
+
+	LastMessage := Message{
+		Who:     "???",
+		Message: "life isn't e\nz",
+		When:    time.Now().UTC().Add(-50 * time.Hour),
+	}
+
 	caster := NewBroadcaster()
 	mux := http.NewServeMux()
 
@@ -112,36 +100,34 @@ func NewServer(waitTime time.Duration) http.Handler {
 
 	mux.HandleFunc("/touch", func(w http.ResponseWriter, r *http.Request) {
 
-		id, _ := WhoIsFromRequest(r)
-
-		log.Printf("/touch by %s", id)
-
 		if r.Method != "POST" {
 			return
 		}
 
-		r.ParseForm()
+		// r.ParseForm()
 
 		var message Message
-		var response MessageResponse
-
 		decoder := json.NewDecoder(r.Body)
 		decoder.Decode(&message)
 
-		// Get updates ready
-		now := time.Now().UTC()
-		// past := time.Now().UTC().Add(-waitTime)
-		// lastWho := LastTouch.Who
-		// lastWhen := LastTouch.When
+		id, _ := WhoIsFromRequest(r)
+		id = message.Who
 
-		// XXX: Only update if it's a new person
+		log.Printf("/touch by %s", id)
 
-		// Update
-		LastMessage.Mutex.Lock()
-		LastMessage.Who = id
-		LastMessage.When = now
-		LastMessage.Message = message.Message
-		LastMessage.Mutex.Unlock()
+		var response MessageResponse
+
+		if message.Who != LastMessage.Who {
+			LastMessage.Mutex.Lock()
+			LastMessage.Who = id
+			LastMessage.When = time.Now().UTC()
+			LastMessage.Message = message.Message
+			LastMessage.Mutex.Unlock()
+			response.Success = true
+		} else {
+			response.Success = false
+			response.Error = "nvm"
+		}
 
 		encoded, _ := json.Marshal(response)
 		fmt.Fprint(w, string(encoded))

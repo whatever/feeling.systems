@@ -5,6 +5,9 @@ import message from "./feeling-systems.txt";
 console.log(message);
 
 
+const DEBUG = false;
+
+
 /**
  * expand
  * Return a list of strings from a text blob.
@@ -69,13 +72,7 @@ function updateScale(t) {
 }());
 
 
-let self = undefined;
-
-
 let textMeOSoHard = undefined;
-
-
-const DEBUG = false;
 
 
 // update
@@ -85,12 +82,12 @@ function update() {
   write(expand(lastTouch.message || ""));
 
   let messageBox = document.getElementById("message-box");
-  messageBox.className = (!DEBUG && lastTouch.last === self) ? "hidden" : "";
+  messageBox.className = (!DEBUG && lastTouch.who === whoami()) ? "hidden" : "";
 
   let closer = document.getElementById("closer");
-  closer.className = (!DEBUG && lastTouch.last === self) ? "hidden" : "";
+  closer.className = (!DEBUG && lastTouch.who === whoami()) ? "hidden" : "";
 
-  document.body.className = lastTouch.last === self ? "unrequited" : "requited";
+  document.body.className = lastTouch.who === whoami() ? "unrequited" : "requited";
 }
 
 
@@ -104,17 +101,22 @@ function connect() {
   let ws = new WebSocket(url);
 
   ws.addEventListener("open", (ev) => {
+    console.log("opened websocket");
+    // ws.send(whoami());
   });
 
   ws.addEventListener("message", (ev) => {
+    console.log("received!");
     lastTouch = JSON.parse(ev.data);
     update();
   });
 
   ws.addEventListener("error", (ev) => {
+    console.log("error:", ev);
   });
 
   ws.addEventListener("close", (ev) => {
+    console.log("closing...");
     setTimeout(connect, 1000);
   });
 }
@@ -183,37 +185,6 @@ window.addEventListener("load", () => {
 
   let form = document.getElementById("write-a-message");
   form.addEventListener("submit", handleSubmit);
-
-  /**
-   * XXX: ...
-  let message = document.getElementById("message");
-  let prevText = message.value;
-  message.addEventListener("input", (ev) => {
-
-    console.log("<<", prevText);
-    console.log(">>", ev.originalTarget.value);
-
-    cascade("i only show girls that I love them");
-
-
-    let cur = message.selectionStart; 
-
-    let lines = expand(message.value);
-    message.value = lines.join("\n");
-
-    message.focus();
-    message.setSelectionRange(cur, cur);
-  });
-  */
-
-  fetch("/whoami")
-    .then(function (res) {
-      return res.text();
-    })
-    .then(function (text) {
-      self = JSON.parse(text).last;
-      update();
-    });
 
   connect();
 
