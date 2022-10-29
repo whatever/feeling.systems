@@ -75,8 +75,8 @@ func NewServer(waitTime time.Duration) http.Handler {
 
 	LastMessage := Message{
 		Who:     "???",
-		Message: "life isn't e\nz",
-		When:    time.Now().UTC().Add(-50 * time.Hour),
+		Message: "𝒸'𝑒𝓈𝓉 𝓁𝒶 𝓋𝒾𝑒\n\nserver\nrestarted",
+		When:    time.Now().UTC().Add(-20 * time.Hour),
 	}
 
 	caster := NewBroadcaster()
@@ -121,7 +121,7 @@ func NewServer(waitTime time.Duration) http.Handler {
 			LastMessage.Mutex.Lock()
 			LastMessage.Who = id
 			LastMessage.When = time.Now().UTC()
-			LastMessage.Message = message.Message
+			LastMessage.Message = message.Message[0:72]
 			LastMessage.Mutex.Unlock()
 			response.Success = true
 		} else {
