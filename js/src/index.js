@@ -1,5 +1,6 @@
 import {whoami} from "./whoami.js";
 import message from "./feeling-systems.txt";
+import {expand, write} from "./utils.js";
 
 
 console.log(message);
@@ -8,46 +9,14 @@ console.log(message);
 const DEBUG = false;
 
 
-/**
- * expand
- * Return a list of strings from a text blob.
- */
-function expand(text) {
-  let textarea = document.getElementById("message");
-  let ncols = textarea.cols;
-  let res = [];
-  text.split("\n").forEach((line) => {
-    while (line.length > ncols) {
-      res.push(line.slice(0, ncols));
-      line = line.slice(ncols);
-    }
-    res.push(line);
-  });
-  return res.slice(0, 6);
-}
-
-
-/**
- * write
- * Replace svg text with multiple lines from an array of strings.
- */
-function write(lines) {
-  let textMeSoHard = document.getElementById("text-me-so-hard");
-  textMeSoHard.innerHTML = "";
-  lines.forEach((line, i) => {
-    let x = 0;
-    let y = (i+1)*100;
-    let el = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    el.setAttribute("x", "0");
-    el.setAttribute("y", y.toString());
-    el.setAttribute("xml:space", "preserve");
-    el.textContent = line;
-    textMeSoHard.appendChild(el);
-  });
-}
-
 let lastTouch = {};
 
+
+/**
+ * Update Scale of Distortion Map
+ *
+ * ...
+ */
 function updateScale(t) {
   let dis = document.getElementById("displacey");
 
@@ -66,18 +35,11 @@ function updateScale(t) {
   dis.scale.baseVal = Math.min(scale, 80.0);
 }
 
-(function loopUpdateScale() {
-  requestAnimationFrame(loopUpdateScale);
-  updateScale(lastTouch.when);
-}());
-
-
-let textMeOSoHard = undefined;
-
-
-// update
-//
-// Update DOM
+/**
+ * Update  DOM
+ *
+ * ...
+ */
 function update() {
   write(expand(lastTouch.message || ""));
 
@@ -91,32 +53,36 @@ function update() {
 }
 
 
-// connect
-// connect
-// connect
-function connect() {
+/**
+ * Connect Websocket
+ * 
+ * Connect, Register Listener, Attempt to reopen on failure
+ */
+function ConnectWebsocket() {
 
   let url = location.origin.replace("http", "ws") + "/holding";
 
   let ws = new WebSocket(url);
 
+  console.log(url);
+
   ws.addEventListener("open", (ev) => {
-    console.log("opened websocket");
-    // ws.send(whoami());
+    console.log("[open] websocket as " + whoami());
+    ws.send(whoami());
   });
 
   ws.addEventListener("message", (ev) => {
-    console.log("received!");
     lastTouch = JSON.parse(ev.data);
+    console.log("[message] received from " + lastTouch.who);
     update();
   });
 
-  ws.addEventListener("error", (ev) => {
-    console.log("error:", ev);
+  ws.addEventListener("error", (err) => {
+    console.log("[error] " + err);
   });
 
   ws.addEventListener("close", (ev) => {
-    console.log("closing...");
+    console.log("[close]");
     setTimeout(connect, 1000);
   });
 }
@@ -149,9 +115,9 @@ function handleSubmit(ev) {
   }).then((text) => {
     return text.json();
   }).then((resp) => {
-    console.log("submit succeeded");
+    console.log("[submit] success");
   }).catch((err) => {
-    console.log("submit failed");
+    console.log("[submit] fail");
     console.error(err);
   });
 
@@ -162,31 +128,13 @@ function handleSubmit(ev) {
   return false;
 }
 
-/**
- * XXX: 
-function cascade(string) {
-  let lines = string.split("\n");
-
-  let res = [];
-
-  lines.forEach((line) => {
-    console.log(line.match(/.{1,12}/g));
-  });
-
-  console.log(lines);
-
-  return "";
-}
-*/
-
 window.addEventListener("load", () => {
+  document.getElementById("write-a-message").addEventListener("submit", handleSubmit);
 
-  textMeOSoHard = document.getElementById("text-me-so-hard");
+  ConnectWebsocket();
 
-  let form = document.getElementById("write-a-message");
-  form.addEventListener("submit", handleSubmit);
-
-  connect();
-
-  console.log("id ....... " + whoami());
+  (function loopUpdateScale() {
+    requestAnimationFrame(loopUpdateScale);
+    updateScale(lastTouch.when);
+  }());
 });

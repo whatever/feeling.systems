@@ -40,7 +40,6 @@ body.unrequited {
 }
 
 #message-box {
-  border: solid 0px black;
   width: 100%;
   padding: 0;
 }
@@ -50,15 +49,10 @@ body.unrequited {
   display: block;
   width: 400px;
   max-width: 100%;
-  margin: 0 auto;
 }
 
-#closer {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  font-size: 40pt;
-  border-radius: 0.5em 0 0 0;
+#container {
+  position: relative;
 }
 
 #closer, #message-box {
@@ -79,14 +73,15 @@ body.unrequited {
   display: block;
 } 
 
-#closer, #message-box {
-}
-
 #closer {
+  box-sizing: border-box;
+  border-radius: 0.5em 0 0 0;
   color: rgba(255, 255, 255, 0.5);
+  position: absolute;
+  right: 0;
+  top: -40pt;
+  height: 40pt;
   z-index: 100;
-  padding-top: 0.5em;
-  padding-left: 0.25em;
 }
 
 

@@ -23,6 +23,21 @@ type Message struct {
 	Mutex   sync.Mutex `json:"-"`
 }
 
+func Shorten(str string, n int) string {
+	strlen := len(str)
+	if strlen > n {
+		strlen = n
+	}
+	return str[0:strlen]
+}
+
+func (msg *Message) Set(v *Message) {
+	msg.Who = Shorten(v.Who, 16)
+	msg.When = v.When
+	msg.Message = Shorten(v.Message, 72)
+	msg.Nonce = Shorten(v.Nonce, 16)
+}
+
 func (msg *Message) Json() []byte {
 	var response TouchResponse
 	response.Who = msg.Who
@@ -119,9 +134,11 @@ func NewServer(waitTime time.Duration) http.Handler {
 
 		if message.Who != LastMessage.Who {
 			LastMessage.Mutex.Lock()
-			LastMessage.Who = id
-			LastMessage.When = time.Now().UTC()
-			LastMessage.Message = message.Message[0:72]
+			LastMessage.Set(&Message{
+				Who:     id,
+				When:    time.Now().UTC(),
+				Message: message.Message,
+			})
 			LastMessage.Mutex.Unlock()
 			response.Success = true
 		} else {

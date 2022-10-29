@@ -18,20 +18,8 @@ module.exports = {
         use: ['babel-loader'],
       },
       {
-        test: /\.css$/i,
-        use: ["style-loader", "css-loader"],
-      },
-      {
-        test: /\.gltf$/,
-        loader: 'raw-loader',
-      },
-      {
         test: /\.txt$/,
         type: "asset/source",
-      },
-      {
-        test: /\.(frag|vert)?$/,
-        loader: 'raw-loader',
       },
     ],
   },
