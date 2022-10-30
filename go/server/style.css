@@ -2,6 +2,11 @@ html, body {
   padding: 0;
   margin: 0;
   font-size: 40pt;
+  height: 100%;
+  width: 100%;
+}
+
+body {
 }
 
 body {
@@ -10,16 +15,15 @@ body {
   color: white;
 }
 
-body.unchecked {
-  /* cursor: help; */
-}
-
-body.requited {
+.requited {
   background-color: #E97D9E;
+  scrollbar-color:  #6DC4DA transparent;
+
 }
 
-body.unrequited {
+.unrequited {
   background-color: #6DC4DA;
+  scrollbar-color: #E97D9E transparent;
 }
 
 .wavy {
@@ -28,20 +32,26 @@ body.unrequited {
 }
 
 #vp {
-  height: 100vh;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  height: 100%;
+  width: 100%;
 }
 
 #you-wont-believe-this {
   white-space: pre;
+  height: 100%;
   max-height: 90vh;
+  max-width: 100%;
 }
 
 #message-box {
   width: 100%;
   padding: 0;
+  padding-top: 0.1em;
+  padding-left: 0.1em;
+  box-sizing: border-box;
 }
 
 #write-a-message {
@@ -51,7 +61,8 @@ body.unrequited {
   max-width: 100%;
 }
 
-#container {
+#message-box-container {
+  box-sizing: border-box;
   position: relative;
 }
 
@@ -75,13 +86,16 @@ body.unrequited {
 
 #closer {
   box-sizing: border-box;
-  border-radius: 0.5em 0 0 0;
+  border-radius: 0 0.3em 0 0;
   color: rgba(255, 255, 255, 0.5);
   position: absolute;
-  right: 0;
-  top: -40pt;
-  height: 40pt;
+  left: 0;
+  top: -50pt;
+  height: 50pt;
   z-index: 100;
+  padding-top: 0.2em;
+  padding-right: 0.22em;
+  padding-left: 0.22em;
 }
 
 
