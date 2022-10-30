@@ -46,6 +46,15 @@ body {
   max-height: 94%;
 }
 
+@media (min-aspect-ratio: 1/1) {
+  #you-wont-believe-this {
+    width: auto;
+    max-height: auto;
+    height: 94%;
+    max-width: 100%;
+  }
+}
+
 #message-box {
   width: 100%;
   padding: 0;
