@@ -3,9 +3,6 @@ import message from "./feeling-systems.txt";
 import {expand, write} from "./utils.js";
 
 
-console.log(message);
-
-
 const DEBUG = false;
 
 
@@ -19,6 +16,10 @@ let lastTouch = {};
  */
 function updateScale(t) {
   let dis = document.getElementById("displacey");
+
+  if (!dis) {
+    return;
+  }
 
   if (t === undefined || t < 0) {
     return;
@@ -43,13 +44,24 @@ function updateScale(t) {
 function update() {
   write(expand(lastTouch.message || ""));
 
+  const HIDE_CLASS = "hidden";
+
   let messageBox = document.getElementById("message-box");
-  messageBox.className = (!DEBUG && lastTouch.who === whoami()) ? "hidden" : "";
+
+  if (!messageBox) {
+    return;
+  }
+
+  messageBox.className = (!DEBUG && lastTouch.who === whoami()) ? HIDE_CLASS : "";
+
+  let messageBoxContainer = document.getElementById("message-box-container");
+  messageBoxContainer.className = (!DEBUG && lastTouch.who === whoami()) ? HIDE_CLASS : "";
 
   let closer = document.getElementById("closer");
-  closer.className = (!DEBUG && lastTouch.who === whoami()) ? "hidden" : "";
+  closer.className = (!DEBUG && lastTouch.who === whoami()) ? HIDE_CLASS : "";
 
   document.body.className = lastTouch.who === whoami() ? "unrequited" : "requited";
+  document.documentElement.className = lastTouch.who === whoami() ? "unrequited" : "requited";
 }
 
 
@@ -83,7 +95,7 @@ function ConnectWebsocket() {
 
   ws.addEventListener("close", (ev) => {
     console.log("[close]");
-    setTimeout(connect, 1000);
+    setTimeout(ConnectWebsocket, 1000);
   });
 }
 
@@ -130,9 +142,7 @@ function handleSubmit(ev) {
 
 window.addEventListener("load", () => {
   document.getElementById("write-a-message").addEventListener("submit", handleSubmit);
-
   ConnectWebsocket();
-
   (function loopUpdateScale() {
     requestAnimationFrame(loopUpdateScale);
     updateScale(lastTouch.when);

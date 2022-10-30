@@ -4,6 +4,11 @@
  */
 export function expand(text) {
   let textarea = document.getElementById("message");
+
+  if (!textarea) {
+    return;
+  }
+
   let ncols = textarea.cols;
   let res = [];
   text.split("\n").forEach((line) => {
@@ -23,6 +28,11 @@ export function expand(text) {
  */
 export function write(lines) {
   let textMeSoHard = document.getElementById("text-me-so-hard");
+
+  if (!textMeSoHard) {
+    return;
+  }
+
   textMeSoHard.innerHTML = "";
   lines.forEach((line, i) => {
     let x = 0;
