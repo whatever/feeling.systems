@@ -42,7 +42,8 @@ body {
 #you-wont-believe-this {
   box-sizing: border-box;
   white-space: pre;
-  height: 94%;
+  width: 100%;
+  max-height: 94%;
 }
 
 #message-box {
