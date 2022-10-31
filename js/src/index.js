@@ -79,8 +79,6 @@ function ConnectWebsocket() {
 
   let ws = new WebSocket(url);
 
-  console.log(url);
-
   ws.addEventListener("open", (ev) => {
     console.log("[open] websocket as " + whoami());
     ws.send(whoami());
@@ -97,8 +95,10 @@ function ConnectWebsocket() {
   });
 
   ws.addEventListener("close", (ev) => {
-    console.log("[close]");
-    setTimeout(ConnectWebsocket, 1000);
+    if (ev.code !== 1000 && ev.code !== 1001) {
+      console.log("[close]", ev);
+      setTimeout(ConnectWebsocket, 1000);
+    }
   });
 }
 

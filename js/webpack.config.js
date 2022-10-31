@@ -5,10 +5,10 @@ const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 module.exports = {
   entry: "./src/index.js",
   output: {
-    path: path.resolve(__dirname, "../go/server/"),
+    path: path.resolve(__dirname, "../go/server/static/"),
     filename: "feeling-systems.bundled.js",
     libraryTarget: "var",
-    library: "plz",
+    library: "x_x",
   },
   module: {
     rules: [

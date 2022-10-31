@@ -67,16 +67,19 @@ func WhoIsFromRequest(r *http.Request) (string, error) {
 	return host + "//" + ua, nil
 }
 
-//go:embed style.css
+//go:embed static/style.css
 var StyleCss string
 
-//go:embed feeling-systems.bundled.js
+//go:embed static/normalize.css
+var NormalizeCss string
+
+//go:embed static/feeling-systems.bundled.js
 var FeelingSystemsBundledJs string
 
-//go:embed index.html
+//go:embed static/index.html
 var IndexHtml string
 
-//go:embed favicon.ico
+//go:embed static/favicon.ico
 var FavIconIco string
 
 // Upgrader!
@@ -181,6 +184,10 @@ func NewServer(waitTime time.Duration) http.Handler {
 		w.Header().Set("Content-Type", "text/javascript")
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, FeelingSystemsBundledJs)
+	})
+
+	mux.HandleFunc("/static/normalize.css", func(w http.ResponseWriter, req *http.Request) {
+		fmt.Fprint(w, NormalizeCss)
 	})
 
 	mux.HandleFunc("/favicon.ico", func(w http.ResponseWriter, req *http.Request) {

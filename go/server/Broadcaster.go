@@ -23,6 +23,7 @@ func (caster *Broadcaster) Add(conn *websocket.Conn, id string) {
 		// Auto-remove
 		defer func() {
 			log.Printf("closing connection for %s", id)
+			conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(1000, ""))
 			conn.Close()
 			caster.Mutex.Lock()
 			caster.Connections[conn] = ""
