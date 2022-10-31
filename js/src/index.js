@@ -3,6 +3,9 @@ import message from "./feeling-systems.txt";
 import {expand, write} from "./utils.js";
 
 
+console.log(message);
+
+
 const DEBUG = false;
 
 
