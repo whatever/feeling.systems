@@ -144,6 +144,7 @@ function handleSubmit(ev) {
 }
 
 window.addEventListener("load", () => {
+  let url = location.origin.replace("http", "ws") + "/holding";
   document.getElementById("write-a-message").addEventListener("submit", handleSubmit);
   ConnectWebsocket();
   (function loopUpdateScale() {

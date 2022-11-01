@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"regexp"
 	"sync"
 	"time"
 
@@ -194,8 +195,10 @@ func NewServer(waitTime time.Duration) http.Handler {
 		fmt.Fprint(w, FavIconIco)
 	})
 
+	re := regexp.MustCompile("^\\/tether\\/[a-zA-Z0-9]{16}$")
+
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path != "/" {
+		if req.URL.Path != "/" && !re.MatchString(req.URL.Path) {
 			http.NotFound(w, req)
 			return
 		}
