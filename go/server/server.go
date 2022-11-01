@@ -92,6 +92,8 @@ var upgrader = websocket.Upgrader{
 // NewServer returns a mux-server with all the routes attached.
 func NewServer(waitTime time.Duration) http.Handler {
 
+	re := regexp.MustCompile("^\\/tether\\/[a-zA-Z0-9]{16}$")
+
 	LastMessage := Message{
 		Who:     "???",
 		Message: "𝒸'𝑒𝓈𝓉 𝓁𝒶 𝓋𝒾𝑒\n\nserver\nrestarted",
@@ -158,21 +160,10 @@ func NewServer(waitTime time.Duration) http.Handler {
 		}()
 	})
 
-	mux.HandleFunc("/whoami", func(w http.ResponseWriter, r *http.Request) {
-
-		id, _ := WhoIsFromRequest(r)
-
-		log.Printf("/whoami by %s", id)
-
-		var response TouchResponse
-		response.Who, _ = WhoIsFromRequest(r)
-		response.When = time.Now().UTC().Unix()
-		encoded, _ := json.Marshal(response)
-		fmt.Fprint(w, string(encoded))
-	})
-
-	mux.HandleFunc("/last", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, string(LastMessage.Json()))
+	mux.HandleFunc("/normalize.css", func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set("Content-Type", "text/css")
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, NormalizeCss)
 	})
 
 	mux.HandleFunc("/style.css", func(w http.ResponseWriter, req *http.Request) {
@@ -187,15 +178,9 @@ func NewServer(waitTime time.Duration) http.Handler {
 		fmt.Fprint(w, FeelingSystemsBundledJs)
 	})
 
-	mux.HandleFunc("/static/normalize.css", func(w http.ResponseWriter, req *http.Request) {
-		fmt.Fprint(w, NormalizeCss)
-	})
-
 	mux.HandleFunc("/favicon.ico", func(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprint(w, FavIconIco)
 	})
-
-	re := regexp.MustCompile("^\\/tether\\/[a-zA-Z0-9]{16}$")
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path != "/" && !re.MatchString(req.URL.Path) {
