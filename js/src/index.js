@@ -60,9 +60,6 @@ function update() {
   let messageBoxContainer = document.getElementById("message-box-container");
   messageBoxContainer.className = (!DEBUG && lastTouch.who === whoami()) ? HIDE_CLASS : "";
 
-  let closer = document.getElementById("closer");
-  closer.className = (!DEBUG && lastTouch.who === whoami()) ? HIDE_CLASS : "";
-
   document.body.className = lastTouch.who === whoami() ? "unrequited" : "requited";
   document.documentElement.className = lastTouch.who === whoami() ? "unrequited" : "requited";
 }

@@ -1,9 +1,9 @@
 html, body {
   padding: 0;
   margin: 0;
-  font-size: 40pt;
   height: 100%;
   width: 100%;
+  font-size: 14pt;
 }
 
 body {
@@ -89,7 +89,6 @@ body {
 
 #submitter. #message {
   width: 100%;
-  font-size: 26pt;
   display: block;
 } 
 
@@ -101,6 +100,7 @@ body {
   left: 0;
   top: -50pt;
   height: 50pt;
+  font-size: 40pt;
   z-index: 100;
   padding-top: 0.2em;
   padding-right: 0.22em;
