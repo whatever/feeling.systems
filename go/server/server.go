@@ -92,7 +92,7 @@ var upgrader = websocket.Upgrader{
 // NewServer returns a mux-server with all the routes attached.
 func NewServer(waitTime time.Duration) http.Handler {
 
-	re := regexp.MustCompile("^\\/tether\\/[a-zA-Z0-9]{16}$")
+	tethregex := regexp.MustCompile("^\\/tether\\/[a-zA-Z0-9]{16}$")
 
 	LastMessage := Message{
 		Who:     "???",
@@ -124,8 +124,6 @@ func NewServer(waitTime time.Duration) http.Handler {
 		if r.Method != "POST" {
 			return
 		}
-
-		// r.ParseForm()
 
 		var message Message
 		decoder := json.NewDecoder(r.Body)
@@ -183,7 +181,7 @@ func NewServer(waitTime time.Duration) http.Handler {
 	})
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path != "/" && !re.MatchString(req.URL.Path) {
+		if req.URL.Path != "/" && !tethregex.MatchString(req.URL.Path) {
 			http.NotFound(w, req)
 			return
 		}
