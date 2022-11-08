@@ -13,8 +13,8 @@ export function expand(text) {
   let res = [];
   text.split("\n").forEach((line) => {
     while (line.length > ncols) {
-      res.push(line.slice(0, ncols));
-      line = line.slice(ncols);
+      res.push(unicodeStringSlice(line, 0, ncols));
+      line = unicodeStringSlice(line, ncols);
     }
     res.push(line);
   });
@@ -44,4 +44,14 @@ export function write(lines) {
     el.textContent = line;
     textMeSoHard.appendChild(el);
   });
+}
+
+/**
+ * stringSlice
+ *
+ * Return a subset of a string which may be unicode.
+ * NOTE: This fixed bad behavior for `"𝒾 𝓌𝑜𝓊𝓁𝒹 𝒹𝒾𝑒 𝟦 𝓊".slice(0, 3)`
+ */
+export function unicodeStringSlice(str, start, end) {
+  return [...str].slice(start, end).join("");
 }
