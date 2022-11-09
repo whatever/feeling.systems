@@ -2,6 +2,10 @@ import {whoami} from "./whoami.js";
 import message from "./feeling-systems.txt";
 import {expand, write} from "./utils.js";
 
+export {
+  whoami,
+};
+
 
 console.log(message);
 

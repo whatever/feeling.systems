@@ -18,12 +18,13 @@ body {
 .requited {
   background-color: #E97D9E;
   scrollbar-color:  #6DC4DA transparent;
-
+  background-color: #ebc5de;
 }
 
 .unrequited {
   background-color: #6DC4DA;
   scrollbar-color: #E97D9E transparent;
+  background-color: #fcba03;
 }
 
 .wavy {
@@ -79,6 +80,12 @@ body {
   background-color: rgba(0, 0, 0, 0.2);
 }
 
+#tether-qr, #tether-qr .tab {
+  box-sizing: border-box;
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
 #closer, #message, #submitter {
   margin: 0;
   padding: 0;
@@ -107,6 +114,20 @@ body {
   padding-left: 0.22em;
 }
 
+.tab {
+  box-sizing: border-box;
+  border-radius: 0 0.3em 0 0;
+  color: rgba(255, 255, 255, 0.5);
+  position: absolute;
+  left: 0;
+  top: -50pt;
+  height: 50pt;
+  font-size: 40pt;
+  z-index: 100;
+  padding-top: 0.2em;
+  padding-right: 0.22em;
+  padding-left: 0.22em;
+}
 
 #message {
   background-color: rgba(255, 255, 255, 0.4);

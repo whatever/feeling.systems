@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/style.css">
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
     <script src="/feeling-systems.bundled.js"></script>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
   </head>
 
   <body>
@@ -54,6 +55,22 @@
           ></textarea><input type="submit" value="send a missive" id="submitter"></form>
       </div>
     </div>
+
+    <br><br>
+
+    <div id="tether-qr"><div class="tab">qr</div></div>
+    <script>
+      new QRCode(document.getElementById("tether-qr"), {
+        text: "https://feeling.systems/tether/" + x_x.whoami(),
+        width: 128,
+        height: 128,
+        colorDark: "#000000",
+        colorLight: "#FFFFFF",
+        correctLevel: QRCode.CorrectLevel.L,
+      });
+      //*/
+    </script>
+
     <!-- -->
 
     <!-- ANIMATION for MESSAGE -->
